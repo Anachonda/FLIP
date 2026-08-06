@@ -963,7 +963,7 @@
           <button class="save-btn" id="dictExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Werkwijze: download de lijst, bewerk 'm lokaal in kladblok/notepad (één term per regel, gescheiden met <code>|</code>), en importeer 'm hier weer. De geïmporteerde lijst wordt gedeeld opgeslagen voor het hele team.
+          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm permanent bijwerken voor iedereen? Bewerk <code>fpe_woordenboek.txt</code> en upload 'm terug naar de repository. Importeren hieronder overschrijft de lijst alleen tijdelijk, voor jouw eigen scherm.
         </p>
         <div class="status-msg" id="dictStatus"></div>
       </div>
@@ -996,7 +996,7 @@
           <button class="save-btn" id="storyExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Bewerk lokaal, importeer hier weer. Geldt voor jouw sessie — deel het bestand met collega's om bij te werken.
+          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm permanent bijwerken voor iedereen? Bewerk <code>fpe_successen.txt</code> en upload 'm terug naar de repository. Importeren hieronder overschrijft de lijst alleen tijdelijk, voor jouw eigen scherm.
         </p>
         <div class="status-msg" id="storyStatus"></div>
       </div>
@@ -1041,7 +1041,7 @@
           <button class="save-btn" id="promptExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Bewerk lokaal, importeer hier weer. Geldt voor jouw sessie — deel het bestand met collega's om bij te werken.
+          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm permanent bijwerken voor iedereen? Bewerk <code>fpe_overlegvragen.txt</code> en upload 'm terug naar de repository. Importeren hieronder overschrijft de lijst alleen tijdelijk, voor jouw eigen scherm.
         </p>
         <div class="status-msg" id="promptStatus"></div>
       </div>
@@ -1101,6 +1101,28 @@ function parsePipeLines(content, fieldCount){
     .map(l => l.trim())
     .filter(l => l.length > 0 && l.includes('|'))
     .map(line => line.split('|').map(s => s.trim()));
+}
+function parseStoriesTxt(content){
+  const rows = parsePipeLines(content).filter(r => r.length >= 3);
+  return rows.map(r => ({
+    tag: r[0].toLowerCase().includes('flater') ? 'flater' : 'succes',
+    meta: r[1],
+    text: r.slice(2).join('|').trim()
+  })).filter(s => s.text);
+}
+function parsePromptsTxt(content){
+  const rows = parsePipeLines(content).filter(r => r.length >= 2);
+  return rows.map(r => ({ kw: r[0], text: r.slice(1).join('|').trim() })).filter(p => p.text);
+}
+
+/* ---------- automatisch laden vanaf GitHub (bron van waarheid) ---------- */
+const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/Anachonda/FLIP/main/';
+async function fetchGithubTxt(filename){
+  try{
+    const res = await fetch(GITHUB_RAW_BASE + filename + '?t=' + Date.now(), { cache:'no-store' });
+    if(!res.ok) return null;
+    return await res.text();
+  }catch(e){ return null; } // offline / lokaal geopend / netwerkfout: gewoon terugvallen op de ingebouwde lijst
 }
 
 /* ============================================================
@@ -1363,12 +1385,7 @@ document.getElementById('storyImportBtn').addEventListener('click', () => {
   if(!file){ status.textContent = 'Kies eerst een .txt-bestand.'; return; }
   const reader = new FileReader();
   reader.onload = (e) => {
-    const rows = parsePipeLines(e.target.result).filter(r => r.length >= 3);
-    const parsed = rows.map(r => ({
-      tag: r[0].toLowerCase().includes('flater') ? 'flater' : 'succes',
-      meta: r[1],
-      text: r.slice(2).join('|').trim()
-    })).filter(s => s.text);
+    const parsed = parseStoriesTxt(e.target.result);
     if(parsed.length === 0){ status.textContent = 'Geen geldige regels gevonden (verwacht: succes/flater | bron | tekst).'; return; }
     storyList = parsed;
     status.textContent = `✓ ${parsed.length} verhalen geïmporteerd — actief voor deze sessie.`;
@@ -1547,8 +1564,7 @@ document.getElementById('promptImportBtn').addEventListener('click', () => {
   if(!file){ status.textContent = 'Kies eerst een .txt-bestand.'; return; }
   const reader = new FileReader();
   reader.onload = (e) => {
-    const rows = parsePipeLines(e.target.result).filter(r => r.length >= 2);
-    const parsed = rows.map(r => ({ kw: r[0], text: r.slice(1).join('|').trim() })).filter(p => p.text);
+    const parsed = parsePromptsTxt(e.target.result);
     if(parsed.length === 0){ status.textContent = 'Geen geldige regels gevonden (verwacht: kernwaarde | vraag).'; return; }
     promptList = parsed;
     drawWheel(promptList);
@@ -1872,6 +1888,16 @@ document.getElementById('linkedinUploadBtn').addEventListener('click', () => {
    INIT
    ============================================================ */
 (async function init(){
+  // haal de actuele lijsten op vanaf GitHub; val terug op de ingebouwde data als dat niet lukt
+  const [dictTxt, storyTxt, promptTxt] = await Promise.all([
+    fetchGithubTxt('fpe_woordenboek.txt'),
+    fetchGithubTxt('fpe_successen.txt'),
+    fetchGithubTxt('fpe_overlegvragen.txt'),
+  ]);
+  if(dictTxt){ const parsed = parseTxt(dictTxt); if(parsed.length) dictList = parsed; }
+  if(storyTxt){ const parsed = parseStoriesTxt(storyTxt); if(parsed.length) storyList = parsed; }
+  if(promptTxt){ const parsed = parsePromptsTxt(promptTxt); if(parsed.length){ promptList = parsed; } }
+
   renderDict();
   drawWheel(promptList);
   buildReelStrip();
