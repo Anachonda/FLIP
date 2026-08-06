@@ -865,12 +865,13 @@
         <h3 class="stats-title" style="margin:0;">📈 LinkedIn-cijfers per periode</h3>
         <span class="update-badge" id="lastUpdateBadge">Laatste update: —</span>
       </div>
-      <p class="module-sub">Upload maandelijks of per kwartaal de nieuwste cijfers als Excel-bestand (kolommen: periode, weergaven, reacties, comments, nieuwe volgers). Nieuwe periodes worden toegevoegd aan de reeks — bestaande periodes blijven staan. Het lopende, nog niet afgeronde kwartaal wordt automatisch buiten de cijfers en grafieken gehouden, zodat het beeld niet vertekend raakt.</p>
+      <p class="module-sub">Upload gewoon je LinkedIn-download (tabblad "Statistieken", en indien aanwezig "Nieuwe volgers") — die wordt automatisch per kwartaal opgeteld, inclusief volgersgroei. Wil je zelf een lijstje corrigeren of aanvullen, dan werkt ook een eigen Excel-bestand (kolommen: periode, weergaven, reacties, comments, klikken, reposts, nieuwe volgers — klikken en reposts zijn optioneel). Nieuwe periodes worden toegevoegd, bestaande periodes blijven staan — en het lopende, nog niet afgeronde kwartaal wordt automatisch buiten de cijfers en grafieken gehouden. Deze app laadt de reeks automatisch vanaf GitHub (<code>fpe_linkedin_cijfers.txt</code>) — wil je 'm permanent bijwerken voor iedereen: upload je LinkedIn-export hier, controleer/corrigeer eventueel in de beheertabel onderaan, download dan als .txt en upload dat naar de repository.</p>
 
       <div class="dash-controls">
         <input type="file" id="linkedinFileInput" accept=".xlsx,.xls,.csv">
         <button class="save-btn" id="linkedinUploadBtn">Upload cijfers</button>
         <button class="save-btn" id="linkedinExportBtn" style="background:var(--amber); color:var(--text);">Download reeks als .xlsx</button>
+        <button class="save-btn" id="linkedinExportTxtBtn">Download .txt voor GitHub</button>
         <select id="rangeSelect">
           <option value="all">Alle periodes</option>
           <option value="4">Laatste 4</option>
@@ -882,7 +883,7 @@
       <div class="stat-grid" style="margin:20px 0 28px;">
         <div class="stat-card">
           <div class="stat-number" id="statAvgInteraction">—</div>
-          <div class="stat-label">gemiddeld interactiepercentage over de gekozen periode<br>(reacties + comments) ÷ weergaven</div>
+          <div class="stat-label">gemiddeld interactiepercentage over de gekozen periode<br>(reacties + comments + klikken + reposts) ÷ weergaven</div>
         </div>
         <div class="stat-card">
           <div class="stat-number" id="statFollowerGain">—</div>
@@ -1588,14 +1589,18 @@ document.getElementById('promptExportBtn').addEventListener('click', () => {
    MODULE 0b: LINKEDIN-DASHBOARD
    ============================================================ */
 const LINKEDIN_STORAGE_KEY = 'flip:linkedin-series';
+/* Klikken en reposts zijn pas recent apart bijgehouden — voor de historische
+   periodes hieronder staan ze daarom op 0. Upload een bijgewerkt bestand met
+   die kolommen erbij zodra je de cijfers per periode terugvindt in LinkedIn
+   (tabblad "Alle bijdragen"), dan wordt het interactiepercentage nauwkeuriger. */
 const SEED_LINKEDIN = [
-  { period:'2025 Q1', views:12636, reactions:228, comments:24, followers:373 },
-  { period:'2025 Q2', views:29520, reactions:843, comments:54, followers:265 },
-  { period:'2025 Q3', views:28541, reactions:728, comments:35, followers:93 },
-  { period:'2025 Q4', views:32516, reactions:766, comments:28, followers:95 },
-  { period:'2026 Q1', views:28517, reactions:786, comments:74, followers:71 },
-  { period:'2026 Q2', views:21681, reactions:477, comments:21, followers:48 },
-  { period:'2026 Q3 (t/m 26 juli)', views:3265, reactions:213, comments:10, followers:13 },
+  { period:'2025 Q1', views:12608, reactions:227, comments:24, clicks:1232, reposts:12, followers:371 },
+  { period:'2025 Q2', views:29441, reactions:838, comments:54, clicks:2001, reposts:20, followers:265 },
+  { period:'2025 Q3', views:28526, reactions:728, comments:34, clicks:1968, reposts:10, followers:93 },
+  { period:'2025 Q4', views:32516, reactions:766, comments:28, clicks:1848, reposts:19, followers:95 },
+  { period:'2026 Q1', views:47559, reactions:786, comments:74, clicks:2807, reposts:22, followers:71 },
+  { period:'2026 Q2', views:21681, reactions:477, comments:21, clicks:1975, reposts:12, followers:48 },
+  { period:'2026 Q3 (t/m 4 augustus)', views:4348, reactions:235, comments:13, clicks:280, reposts:5, followers:13 },
 ];
 let linkedinSeries = [...SEED_LINKEDIN];
 
@@ -1618,6 +1623,23 @@ async function saveLinkedinSeries(){
   }catch(e){ return false; }
 }
 
+/* Canoniek .txt-format voor GitHub: periode | weergaven | reacties | comments | klikken | reposts | nieuwe volgers */
+function parseLinkedinTxt(content){
+  const rows = parsePipeLines(content).filter(r => r.length >= 7);
+  return rows.map(r => ({
+    period: r[0],
+    views: parseNumber(r[1]) || 0,
+    reactions: parseNumber(r[2]) || 0,
+    comments: parseNumber(r[3]) || 0,
+    clicks: parseNumber(r[4]) || 0,
+    reposts: parseNumber(r[5]) || 0,
+    followers: parseNumber(r[6]) || 0,
+  })).filter(row => row.period);
+}
+function toLinkedinTxt(list){
+  return list.map(r => `${r.period} | ${r.views} | ${r.reactions} | ${r.comments} | ${r.clicks || 0} | ${r.reposts || 0} | ${r.followers}`).join('\n') + '\n';
+}
+
 function normalizeHeader(h){ return String(h).toLowerCase().trim(); }
 function findField(rowNorm, aliases){
   for(const [k,v] of Object.entries(rowNorm)){ if(aliases.includes(k)) return v; }
@@ -1634,6 +1656,93 @@ function shortenPeriod(p){ return String(p).replace(/\s*\(.*\)\s*$/, ''); }
 function formatNumber(n){ return Math.round(n).toLocaleString('nl-NL'); }
 function escapeHtml(s){
   return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+const MONTH_NAMES_NL = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+function quarterKeyFromPeriod(p){
+  const m = String(p).match(/(\d{4})\s*Q([1-4])/i);
+  return m ? `${m[1]}-Q${m[2]}` : null;
+}
+function quarterBounds(year, q){
+  const startMonth = (q-1)*3;
+  return { start: new Date(year, startMonth, 1), end: new Date(year, startMonth+3, 0) };
+}
+
+/* Herkent en verwerkt een rechtstreekse LinkedIn-export (tabblad "Statistieken"
+   met dagcijfers) en telt die automatisch op tot kwartaalcijfers. Kwartalen die
+   al compleet en afgerond in de reeks staan, worden niet overschreven door een
+   exportbestand dat dat kwartaal maar deels dekt — zo gaat er nooit data verloren. */
+function isLinkedInExportWorkbook(workbook){
+  return workbook.SheetNames.includes('Statistieken');
+}
+function aggregateLinkedInExport(workbook){
+  const sheet = workbook.Sheets['Statistieken'];
+  const rows = XLSX.utils.sheet_to_json(sheet, { header:1, raw:true, defval:'' });
+  const dataRows = rows.slice(2).filter(r => r && r[0]);
+  const buckets = {};
+  dataRows.forEach(r => {
+    const parts = String(r[0]).trim().split('/');
+    if(parts.length !== 3) return;
+    const mm = parseInt(parts[0],10), dd = parseInt(parts[1],10), yyyy = parseInt(parts[2],10);
+    if(!mm || !dd || !yyyy) return;
+    const q = Math.floor((mm-1)/3) + 1;
+    const key = `${yyyy}-Q${q}`;
+    const dateObj = new Date(yyyy, mm-1, dd);
+    if(!buckets[key]) buckets[key] = { year:yyyy, q, views:0, clicks:0, reactions:0, comments:0, reposts:0, followers:0, hasFollowerData:false, minDate:dateObj, maxDate:dateObj };
+    const b = buckets[key];
+    b.views     += Number(r[3])  || 0; // Weergaven (totaal)
+    b.clicks    += Number(r[7])  || 0; // Klikken (totaal)
+    b.reactions += Number(r[10]) || 0; // Reacties (totaal)
+    b.comments  += Number(r[13]) || 0; // Commentaren (totaal)
+    b.reposts   += Number(r[16]) || 0; // Reposts (totaal)
+    if(dateObj < b.minDate) b.minDate = dateObj;
+    if(dateObj > b.maxDate) b.maxDate = dateObj;
+  });
+
+  // "Nieuwe volgers"-tabblad is optioneel — recentere LinkedIn-downloads bevatten 'm, oudere niet
+  if(workbook.SheetNames.includes('Nieuwe volgers')){
+    const fsheet = workbook.Sheets['Nieuwe volgers'];
+    const frows = XLSX.utils.sheet_to_json(fsheet, { header:1, raw:true, defval:'' });
+    frows.slice(1).filter(r => r && r[0]).forEach(r => {
+      const parts = String(r[0]).trim().split('/');
+      if(parts.length !== 3) return;
+      const mm = parseInt(parts[0],10), dd = parseInt(parts[1],10), yyyy = parseInt(parts[2],10);
+      if(!mm || !dd || !yyyy) return;
+      const q = Math.floor((mm-1)/3) + 1;
+      const key = `${yyyy}-Q${q}`;
+      if(!buckets[key]) return; // volgersdata buiten het bereik van het Statistieken-tabblad — negeren
+      const dagTotaal = (Number(r[1])||0) + (Number(r[2])||0) + (Number(r[3])||0);
+      buckets[key].followers += dagTotaal;
+      buckets[key].hasFollowerData = true;
+    });
+  }
+  return buckets;
+}
+function applyLinkedInExport(workbook){
+  const buckets = aggregateLinkedInExport(workbook);
+  let added = 0, updated = 0, keptExisting = 0;
+  Object.values(buckets).forEach(b => {
+    const { start, end } = quarterBounds(b.year, b.q);
+    const fullyCovered = (b.minDate <= start) && (b.maxDate >= end);
+    const key = `${b.year}-Q${b.q}`;
+    const existingIdx = linkedinSeries.findIndex(r => quarterKeyFromPeriod(r.period) === key);
+
+    if(!fullyCovered && existingIdx >= 0 && isPeriodComplete(linkedinSeries[existingIdx].period)){
+      // een al afgerond kwartaal staat er compleet in — dit bestand dekt het maar deels, dus niet overschrijven
+      keptExisting++;
+      return;
+    }
+    const periodLabel = fullyCovered
+      ? `${b.year} Q${b.q}`
+      : `${b.year} Q${b.q} (t/m ${b.maxDate.getDate()} ${MONTH_NAMES_NL[b.maxDate.getMonth()]})`;
+    // volgersaantal: gebruik het geïmporteerde cijfer als het tabblad aanwezig was, anders het bestaande cijfer behouden
+    const existingFollowers = existingIdx >= 0 ? linkedinSeries[existingIdx].followers : 0;
+    const followers = b.hasFollowerData ? b.followers : existingFollowers;
+    const newRow = { period:periodLabel, views:b.views, reactions:b.reactions, comments:b.comments, clicks:b.clicks, reposts:b.reposts, followers };
+    if(existingIdx >= 0){ linkedinSeries[existingIdx] = newRow; updated++; }
+    else { linkedinSeries.push(newRow); added++; }
+  });
+  return { added, updated, keptExisting };
 }
 
 /* Herkent lopende, nog niet afgesloten periodes (bv. het huidige kwartaal)
@@ -1736,7 +1845,7 @@ function drawGroupedChart(svgId, data, keyA, colorA, keyB, colorB){
 
 function renderLinkedinTable(){
   const wrap = document.getElementById('linkedinTableWrap');
-  let html = '<table class="linkedin-table"><thead><tr><th>Periode</th><th>Weergaven</th><th>Reacties</th><th>Comments</th><th>Nieuwe volgers</th><th></th></tr></thead><tbody>';
+  let html = '<table class="linkedin-table"><thead><tr><th>Periode</th><th>Weergaven</th><th>Reacties</th><th>Comments</th><th>Klikken</th><th>Reposts</th><th>Nieuwe volgers</th><th></th></tr></thead><tbody>';
   linkedinSeries.forEach((row,i) => {
     const lopend = !isPeriodComplete(row.period);
     html += `<tr${lopend ? ' style="opacity:0.65;"' : ''}>
@@ -1744,6 +1853,8 @@ function renderLinkedinTable(){
       <td><input type="text" data-idx="${i}" data-field="views" value="${row.views}"></td>
       <td><input type="text" data-idx="${i}" data-field="reactions" value="${row.reactions}"></td>
       <td><input type="text" data-idx="${i}" data-field="comments" value="${row.comments}"></td>
+      <td><input type="text" data-idx="${i}" data-field="clicks" value="${row.clicks || 0}"></td>
+      <td><input type="text" data-idx="${i}" data-field="reposts" value="${row.reposts || 0}"></td>
       <td><input type="text" data-idx="${i}" data-field="followers" value="${row.followers}"></td>
       <td><button class="row-delete-btn" data-idx="${i}" title="Verwijder periode">×</button></td>
     </tr>`;
@@ -1785,8 +1896,11 @@ function renderLinkedinDashboard(){
   const sumViews = rangeData.reduce((a,d) => a+d.views, 0);
   const sumReactions = rangeData.reduce((a,d) => a+d.reactions, 0);
   const sumComments = rangeData.reduce((a,d) => a+d.comments, 0);
+  const sumClicks = rangeData.reduce((a,d) => a+(d.clicks || 0), 0);
+  const sumReposts = rangeData.reduce((a,d) => a+(d.reposts || 0), 0);
   const sumFollowers = rangeData.reduce((a,d) => a+d.followers, 0);
-  const avgInteraction = sumViews > 0 ? ((sumReactions+sumComments)/sumViews*100) : 0;
+  const totalInteracties = sumReactions + sumComments + sumClicks + sumReposts;
+  const avgInteraction = sumViews > 0 ? (totalInteracties/sumViews*100) : 0;
 
   document.getElementById('statAvgInteraction').textContent = rangeData.length ? avgInteraction.toFixed(1).replace('.',',') + '%' : '—';
   document.getElementById('statFollowerGain').textContent = rangeData.length ? formatNumber(sumFollowers) : '—';
@@ -1815,12 +1929,23 @@ document.getElementById('linkedinExportBtn').addEventListener('click', () => {
     weergaven: r.views,
     reacties: r.reactions,
     comments: r.comments,
+    klikken: r.clicks || 0,
+    reposts: r.reposts || 0,
     'nieuwe volgers': r.followers
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'LinkedIn');
   XLSX.writeFile(wb, 'fpe_linkedin_cijfers.xlsx');
+});
+
+document.getElementById('linkedinExportTxtBtn').addEventListener('click', () => {
+  const blob = new Blob([toLinkedinTxt(linkedinSeries)], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'fpe_linkedin_cijfers.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 });
 
 document.getElementById('linkedinUploadBtn').addEventListener('click', () => {
@@ -1838,6 +1963,22 @@ document.getElementById('linkedinUploadBtn').addEventListener('click', () => {
     try{
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type:'array' });
+
+      if(isLinkedInExportWorkbook(workbook)){
+        // Rechtstreekse LinkedIn-download (tabblad "Statistieken") — automatisch per kwartaal optellen
+        const { added, updated, keptExisting } = applyLinkedInExport(workbook);
+        if(added === 0 && updated === 0){
+          throw new Error('Geen bruikbare dagcijfers gevonden in het tabblad "Statistieken".');
+        }
+        await saveLinkedinSeries();
+        renderLinkedinDashboard();
+        status.style.color = 'var(--violet)';
+        status.textContent = `✓ LinkedIn-export verwerkt: ${added} nieuw kwartaal, ${updated} bijgewerkt` +
+          (keptExisting ? `, ${keptExisting} kwarta(a)l(en) ongemoeid gelaten (dit bestand dekt ze maar deels, bestaande complete cijfers blijven staan).` : '.');
+        fileInput.value = '';
+        return;
+      }
+
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { defval:'' });
       if(!rows.length) throw new Error('Het bestand lijkt leeg.');
@@ -1852,19 +1993,24 @@ document.getElementById('linkedinUploadBtn').addEventListener('click', () => {
         const reactions = parseNumber(findField(rowNorm, ['reacties','reactions']));
         const comments = parseNumber(findField(rowNorm, ['comments']));
         const followers = parseNumber(findField(rowNorm, ['nieuwe volgers','volgers','followers']));
+        // klikken en reposts zijn optioneel — ontbreken ze, dan tellen ze als 0 mee
+        let clicks = parseNumber(findField(rowNorm, ['klikken','clicks']));
+        let reposts = parseNumber(findField(rowNorm, ['reposts','shares','gedeeld']));
+        if(isNaN(clicks)) clicks = 0;
+        if(isNaN(reposts)) reposts = 0;
 
         if(!period || String(period).trim()==='' || isNaN(views) || isNaN(reactions) || isNaN(comments) || isNaN(followers)){
           skipped++; return;
         }
         const periodStr = String(period).trim();
         const existingIdx = linkedinSeries.findIndex(r => r.period.trim().toLowerCase() === periodStr.toLowerCase());
-        const newRow = { period: periodStr, views, reactions, comments, followers };
+        const newRow = { period: periodStr, views, reactions, comments, clicks, reposts, followers };
         if(existingIdx >= 0){ linkedinSeries[existingIdx] = newRow; updated++; }
         else { linkedinSeries.push(newRow); added++; }
       });
 
       if(added === 0 && updated === 0){
-        throw new Error('Geen geldige rijen gevonden. Verwachte kolommen: periode, weergaven, reacties, comments, nieuwe volgers.');
+        throw new Error('Geen geldige rijen gevonden. Verwachte kolommen: periode, weergaven, reacties, comments, nieuwe volgers (klikken en reposts zijn optioneel).');
       }
 
       await saveLinkedinSeries();
@@ -1889,10 +2035,11 @@ document.getElementById('linkedinUploadBtn').addEventListener('click', () => {
    ============================================================ */
 (async function init(){
   // haal de actuele lijsten op vanaf GitHub; val terug op de ingebouwde data als dat niet lukt
-  const [dictTxt, storyTxt, promptTxt] = await Promise.all([
+  const [dictTxt, storyTxt, promptTxt, linkedinTxt] = await Promise.all([
     fetchGithubTxt('fpe_woordenboek.txt'),
     fetchGithubTxt('fpe_successen.txt'),
     fetchGithubTxt('fpe_overlegvragen.txt'),
+    fetchGithubTxt('fpe_linkedin_cijfers.txt'),
   ]);
   if(dictTxt){ const parsed = parseTxt(dictTxt); if(parsed.length) dictList = parsed; }
   if(storyTxt){ const parsed = parseStoriesTxt(storyTxt); if(parsed.length) storyList = parsed; }
@@ -1901,7 +2048,13 @@ document.getElementById('linkedinUploadBtn').addEventListener('click', () => {
   renderDict();
   drawWheel(promptList);
   buildReelStrip();
-  linkedinSeries = await loadLinkedinSeries();
+
+  if(linkedinTxt){
+    const parsed = parseLinkedinTxt(linkedinTxt);
+    linkedinSeries = parsed.length ? parsed : await loadLinkedinSeries();
+  } else {
+    linkedinSeries = await loadLinkedinSeries(); // GitHub-bestand nog niet aanwezig — val terug op opslag/seed
+  }
   renderLinkedinDashboard();
 })();
 
