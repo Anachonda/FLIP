@@ -137,6 +137,171 @@
     padding-top:20px;
     border-top:1px solid var(--line);
   }
+
+  /* ---------- tekstopmaker ---------- */
+  .formatter-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:24px;
+  }
+  @media (max-width:760px){
+    .formatter-grid{ grid-template-columns:1fr; }
+  }
+  .formatter-pane{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .formatter-pane-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 18px;
+    background:var(--surface-2);
+    border-bottom:1px solid var(--line);
+  }
+  .formatter-pane-title{
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:16px;
+    color:var(--text);
+  }
+  .formatter-count{
+    font-family:var(--font-body);
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .formatter-count.limit-near{ color:var(--coral); font-weight:700; }
+  #formatterInput{
+    width:100%;
+    min-height:260px;
+    border:none;
+    resize:vertical;
+    padding:18px;
+    font-family:var(--font-body);
+    font-size:15px;
+    line-height:1.55;
+    color:var(--text);
+    background:transparent;
+  }
+  #formatterInput:focus{ outline:none; }
+  .formatter-output{
+    min-height:260px;
+    padding:18px;
+    font-family:var(--font-body);
+    font-size:15px;
+    line-height:1.55;
+    color:var(--text);
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .formatter-output.empty{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:var(--muted);
+    flex-direction:column;
+    gap:6px;
+  }
+  .formatter-output.empty .fo-icon{ font-size:26px; margin-bottom:4px; }
+  .formatter-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    padding:14px 18px;
+    border-top:1px solid var(--line);
+  }
+  .formatter-toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:18px 0 4px;
+  }
+  .emoji-picker-panel{
+    display:none;
+    grid-template-columns:repeat(auto-fill,minmax(84px,1fr));
+    gap:10px;
+    background:var(--surface-2);
+    border-radius:16px;
+    padding:16px;
+    margin:14px 0 4px;
+  }
+  .emoji-picker-panel.show{ display:grid; }
+  .emoji-pick-btn{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+    font-family:var(--font-body);
+    font-size:11.5px;
+    color:var(--muted);
+  }
+  .emoji-pick-btn:hover{ border-color:var(--violet); color:var(--text); }
+  .emoji-pick-btn .emoji-char{ font-size:22px; }
+  .format-ref-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:12px;
+    margin-top:16px;
+  }
+  .format-ref-card{
+    background:var(--surface-2);
+    border-radius:14px;
+    padding:14px 16px;
+  }
+  .format-ref-title{
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13.5px;
+    color:var(--text);
+    margin-bottom:4px;
+  }
+  .format-ref-example{
+    font-family:var(--font-body);
+    font-size:13px;
+    color:var(--muted);
+  }
+  .formatter-steps{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:18px;
+    margin-top:18px;
+  }
+  .formatter-step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--violet);
+    color:#fff;
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13px;
+    margin-bottom:8px;
+  }
+  .formatter-step-title{
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--text);
+    margin-bottom:4px;
+  }
+  .formatter-step-text{
+    font-family:var(--font-body);
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.5;
+  }
   .module-header-flex{
     display:flex;
     align-items:flex-end;
@@ -876,6 +1041,14 @@
         </span>
         <span class="tile-arrow">→</span>
       </button>
+      <button class="tile-card" data-target="formatter">
+        <span class="tile-emoji">🔠</span>
+        <span class="tile-text">
+          <span class="tile-title">LinkedIn Tekstopmaker</span>
+          <span class="tile-sub">Maak je LinkedIn-tekst vet, cursief of doorgestreept</span>
+        </span>
+        <span class="tile-arrow">→</span>
+      </button>
       <button class="tile-card" data-target="roulette">
         <span class="tile-emoji">🎯</span>
         <span class="tile-text">
@@ -1093,6 +1266,113 @@
     </div>
   </section>
 
+  <!-- ============ MODULE TEKSTOPMAKER ============ -->
+  <section class="module" id="module-formatter">
+    <div class="card">
+      <div class="module-header-flex">
+        <div class="module-header-text">
+          <h2 class="module-title">🔠 De LinkedIn Tekstopmaker</h2>
+          <p class="module-sub">LinkedIn ondersteunt geen echte opmaak — maar met deze truc oogt je post toch verzorgd. Typ met <code>**vet**</code>, <code>*cursief*</code>, <code>~~doorgestreept~~</code> of gewone HTML-tags, en zie meteen hoe het eruitziet.</p>
+        </div>
+        <img class="module-illustration" src="flip_formatter.jpg" alt="FLIP typt enthousiast een LinkedIn-post">
+      </div>
+
+      <div class="formatter-grid">
+        <div class="formatter-pane">
+          <div class="formatter-pane-header">
+            <span class="formatter-pane-title">📄 Invoer</span>
+            <span class="formatter-count" id="formatterCount">0 / 3000 karakters</span>
+          </div>
+          <textarea id="formatterInput" placeholder="Plak hier je tekst...
+
+Bijvoorbeeld:
+**Vetgedrukte tekst** of &lt;strong&gt;HTML vet&lt;/strong&gt;
+*Cursieve tekst* of &lt;em&gt;HTML cursief&lt;/em&gt;
+~~Doorgestreepte tekst~~ of &lt;del&gt;HTML doorgestreept&lt;/del&gt;
+- Bullet wordt automatisch een punt
+
+De app herkent automatisch verschillende opmaakformaten!"></textarea>
+          <div class="formatter-actions">
+            <button class="add-toggle" id="formatterEmojiToggle">😊 Emoji</button>
+            <button class="add-toggle" id="formatterClearBtn">Wissen</button>
+          </div>
+          <div class="emoji-picker-panel" id="formatterEmojiPanel"></div>
+        </div>
+
+        <div class="formatter-pane">
+          <div class="formatter-pane-header">
+            <span class="formatter-pane-title">📈 LinkedIn Output</span>
+          </div>
+          <div class="formatter-output empty" id="formatterOutput">
+            <span class="fo-icon">📈</span>
+            <span>Geen output</span>
+            <span style="font-size:13px;">Begin met typen om de preview te zien</span>
+          </div>
+          <div class="formatter-actions">
+            <button class="save-btn" id="formatterCopyBtn">Kopieer tekst</button>
+          </div>
+          <div class="status-msg" id="formatterStatus" style="padding:0 18px 14px;"></div>
+        </div>
+      </div>
+
+      <h3 class="stats-title" style="margin:32px 0 4px;">Ondersteunde formaten</h3>
+      <div class="format-ref-grid">
+        <div class="format-ref-card">
+          <div class="format-ref-title">Bold Markdown</div>
+          <div class="format-ref-example">**tekst** → <b>tekst</b></div>
+        </div>
+        <div class="format-ref-card">
+          <div class="format-ref-title">Bold HTML</div>
+          <div class="format-ref-example">&lt;strong&gt;tekst&lt;/strong&gt; → <b>tekst</b></div>
+        </div>
+        <div class="format-ref-card">
+          <div class="format-ref-title">Italic Markdown</div>
+          <div class="format-ref-example">*tekst* → <i>tekst</i></div>
+        </div>
+        <div class="format-ref-card">
+          <div class="format-ref-title">Italic HTML</div>
+          <div class="format-ref-example">&lt;em&gt;tekst&lt;/em&gt; → <i>tekst</i></div>
+        </div>
+        <div class="format-ref-card">
+          <div class="format-ref-title">Strikethrough Markdown</div>
+          <div class="format-ref-example">~~tekst~~ → <s>tekst</s></div>
+        </div>
+        <div class="format-ref-card">
+          <div class="format-ref-title">Strikethrough HTML</div>
+          <div class="format-ref-example">&lt;del&gt;tekst&lt;/del&gt; → <s>tekst</s></div>
+        </div>
+        <div class="format-ref-card">
+          <div class="format-ref-title">Bullet points</div>
+          <div class="format-ref-example">- tekst → • tekst</div>
+        </div>
+      </div>
+
+      <h3 class="stats-title" style="margin:32px 0 4px;">Hoe werkt het?</h3>
+      <div class="formatter-steps">
+        <div>
+          <div class="formatter-step-num">1</div>
+          <div class="formatter-step-title">Plak je tekst</div>
+          <div class="formatter-step-text">Begin met typen — de preview werkt live mee.</div>
+        </div>
+        <div>
+          <div class="formatter-step-num">2</div>
+          <div class="formatter-step-title">Voeg emoji's toe</div>
+          <div class="formatter-step-text">Gebruik de emoji-knop voor passende content-emoji's.</div>
+        </div>
+        <div>
+          <div class="formatter-step-num">3</div>
+          <div class="formatter-step-title">Converteer</div>
+          <div class="formatter-step-text">De omzetting gebeurt automatisch terwijl je typt.</div>
+        </div>
+        <div>
+          <div class="formatter-step-num">4</div>
+          <div class="formatter-step-title">Kopieer & plak</div>
+          <div class="formatter-step-text">De geformatteerde tekst werkt direct in een LinkedIn-post.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer class="site-footer">
     <div class="footer-inner">
       Gemaakt voor Linda, Marion, Nanja en Ferencz — team Ondersteuning FPE. Heb je een idee, een nieuwe term of een verhaal voor FLIP? Vraag het even aan Ferencz.
@@ -1112,6 +1392,7 @@
 const MODULES = [
   { id: 'start', label: 'Start' },
   { id: 'linkedin',    label: 'LinkedIn-statistieken' },
+  { id: 'formatter',   label: 'LinkedIn Tekstopmaker' },
   { id: 'roulette',    label: 'Overlegroulette' },
   { id: 'successen',   label: 'Successenbank' },
   { id: 'woordenboek', label: 'Woordenboek' }
@@ -1943,6 +2224,127 @@ document.getElementById('linkedinExportTxtBtn').addEventListener('click', () => 
   URL.revokeObjectURL(url);
 });
 
+
+/* ============================================================
+   MODULE TEKSTOPMAKER
+   ============================================================ */
+const LI_CHAR_LIMIT = 3000;
+
+function toUnicodeBold(str){
+  return str.replace(/[A-Za-z0-9]/g, c => {
+    const code = c.charCodeAt(0);
+    if(c >= 'A' && c <= 'Z') return String.fromCodePoint(0x1D400 + (code - 65));
+    if(c >= 'a' && c <= 'z') return String.fromCodePoint(0x1D41A + (code - 97));
+    if(c >= '0' && c <= '9') return String.fromCodePoint(0x1D7CE + (code - 48));
+    return c;
+  });
+}
+function toUnicodeItalic(str){
+  return str.replace(/[A-Za-z]/g, c => {
+    if(c === 'h') return '\u210E';
+    const code = c.charCodeAt(0);
+    if(c >= 'A' && c <= 'Z') return String.fromCodePoint(0x1D434 + (code - 65));
+    if(c >= 'a' && c <= 'z') return String.fromCodePoint(0x1D44E + (code - 97));
+    return c;
+  });
+}
+function toStrikethrough(str){
+  return str.split('').map(c => c + '\u0336').join('');
+}
+
+function convertLinkedInText(input){
+  let text = input;
+  // vet: HTML en markdown
+  text = text.replace(/<strong>(.+?)<\/strong>/gi, (_,inner) => toUnicodeBold(inner));
+  text = text.replace(/\*\*(.+?)\*\*/g, (_,inner) => toUnicodeBold(inner));
+  // cursief: HTML en markdown
+  text = text.replace(/<em>(.+?)<\/em>/gi, (_,inner) => toUnicodeItalic(inner));
+  text = text.replace(/\*(.+?)\*/g, (_,inner) => toUnicodeItalic(inner));
+  // doorgestreept: HTML en markdown
+  text = text.replace(/<del>(.+?)<\/del>/gi, (_,inner) => toStrikethrough(inner));
+  text = text.replace(/~~(.+?)~~/g, (_,inner) => toStrikethrough(inner));
+  // bullets
+  text = text.split('\n').map(line => line.replace(/^-\s+/, '• ')).join('\n');
+  return text;
+}
+
+const FORMATTER_EMOJIS = [
+  { emoji:'📝', label:'Post' },
+  { emoji:'🔗', label:'Doorlinkartikel' },
+  { emoji:'🎙️', label:'Interview' },
+  { emoji:'🎧', label:'Podcast' },
+  { emoji:'🎥', label:'Video' },
+  { emoji:'📊', label:'Infographic' },
+  { emoji:'📰', label:'Blog' },
+  { emoji:'📅', label:'Evenement' },
+  { emoji:'⭐', label:'Toplijst' },
+  { emoji:'❓', label:'Poll' },
+];
+
+const formatterInput = document.getElementById('formatterInput');
+const formatterOutput = document.getElementById('formatterOutput');
+const formatterCount = document.getElementById('formatterCount');
+
+function renderFormatterOutput(){
+  const raw = formatterInput.value;
+  const len = raw.length;
+  formatterCount.textContent = `${len} / ${LI_CHAR_LIMIT} karakters`;
+  formatterCount.classList.toggle('limit-near', len > LI_CHAR_LIMIT);
+
+  if(raw.trim() === ''){
+    formatterOutput.className = 'formatter-output empty';
+    formatterOutput.innerHTML = '<span class="fo-icon">📈</span><span>Geen output</span><span style="font-size:13px;">Begin met typen om de preview te zien</span>';
+    return;
+  }
+  formatterOutput.className = 'formatter-output';
+  formatterOutput.textContent = convertLinkedInText(raw);
+}
+
+formatterInput.addEventListener('input', renderFormatterOutput);
+
+document.getElementById('formatterClearBtn').addEventListener('click', () => {
+  formatterInput.value = '';
+  renderFormatterOutput();
+  formatterInput.focus();
+});
+
+document.getElementById('formatterCopyBtn').addEventListener('click', async () => {
+  const status = document.getElementById('formatterStatus');
+  const text = convertLinkedInText(formatterInput.value);
+  if(!text){ status.style.color = 'var(--coral)'; status.textContent = 'Nog niks om te kopiëren.'; return; }
+  try{
+    await navigator.clipboard.writeText(text);
+    status.style.color = 'var(--violet)';
+    status.textContent = '✓ Gekopieerd — plak het zo in je LinkedIn-post.';
+  }catch(e){
+    status.style.color = 'var(--coral)';
+    status.textContent = 'Kopiëren lukte niet. Selecteer de tekst handmatig in het outputveld.';
+  }
+});
+
+const emojiPanel = document.getElementById('formatterEmojiPanel');
+FORMATTER_EMOJIS.forEach(item => {
+  const btn = document.createElement('button');
+  btn.className = 'emoji-pick-btn';
+  btn.innerHTML = `<span class="emoji-char">${item.emoji}</span><span>${item.label}</span>`;
+  btn.addEventListener('click', () => {
+    const start = formatterInput.selectionStart ?? formatterInput.value.length;
+    const end = formatterInput.selectionEnd ?? formatterInput.value.length;
+    const val = formatterInput.value;
+    formatterInput.value = val.slice(0, start) + item.emoji + ' ' + val.slice(end);
+    const newPos = start + item.emoji.length + 1;
+    formatterInput.focus();
+    formatterInput.setSelectionRange(newPos, newPos);
+    renderFormatterOutput();
+  });
+  emojiPanel.appendChild(btn);
+});
+
+document.getElementById('formatterEmojiToggle').addEventListener('click', () => {
+  emojiPanel.classList.toggle('show');
+});
+
+renderFormatterOutput();
 
 /* ============================================================
    INIT
