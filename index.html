@@ -918,8 +918,6 @@
       </div>
 
       <div class="dash-controls">
-        <input type="file" id="linkedinFileInput" accept=".xlsx,.xls,.csv">
-        <button class="save-btn" id="linkedinUploadBtn">Upload cijfers</button>
         <button class="save-btn" id="linkedinExportBtn" style="background:var(--amber); color:var(--text);">Download reeks als .xlsx</button>
         <button class="save-btn" id="linkedinExportTxtBtn">Download .txt voor GitHub</button>
         <select id="rangeSelect">
@@ -964,7 +962,7 @@
         <svg id="chartEngagement" class="bar-chart" viewBox="0 0 640 220"></svg>
       </div>
 
-      <button class="add-toggle" id="linkedinTableToggle">⚙ Beheer periodes (bewerken / verwijderen)</button>
+      <button class="add-toggle" id="linkedinTableToggle">⬇ Download & corrigeer periodes</button>
       <div class="add-form" id="linkedinTableForm">
         <div id="linkedinTableWrap"></div>
       </div>
@@ -1007,16 +1005,14 @@
         </div>
       </div>
 
-      <button class="add-toggle" id="dictAddToggle">⚙ Beheer termenlijst (.txt)</button>
+      <button class="add-toggle" id="dictAddToggle">⬇ Download termenlijst</button>
       <div class="add-form" id="dictAddForm">
-        <label>Bestand met termen (.txt, per regel: <em>term | uitleg</em>)</label>
-        <input type="file" id="dictFileInput" accept=".txt" style="color:var(--muted); font-family:var(--font-mono); font-size:13px;">
+        <label>Termenlijst</label>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-          <button class="save-btn" id="dictImportBtn">Importeer bestand</button>
           <button class="save-btn" id="dictExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm permanent bijwerken voor iedereen? Bewerk <code>fpe_woordenboek.txt</code> en upload 'm terug naar de repository. Importeren hieronder overschrijft de lijst alleen tijdelijk, voor jouw eigen scherm.
+          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm bijwerken? Download 'm hierboven, bewerk 'm lokaal, en upload het resultaat als <code>fpe_woordenboek.txt</code> terug naar de repository.
         </p>
         <div class="status-msg" id="dictStatus"></div>
       </div>
@@ -1040,16 +1036,14 @@
         <p class="story-placeholder">Klik op "Verras me" voor een verhaal, quote of mijlpaal.</p>
       </div>
 
-      <button class="add-toggle" id="storyAddToggle">⚙ Beheer successenlijst (.txt)</button>
+      <button class="add-toggle" id="storyAddToggle">⬇ Download successenlijst</button>
       <div class="add-form" id="storyAddForm">
-        <label>Bestand met verhalen (.txt, per regel: <em>succes/flater | bron | tekst</em>)</label>
-        <input type="file" id="storyFileInput" accept=".txt" style="color:var(--muted); font-family:var(--font-mono); font-size:13px;">
+        <label>Successenlijst</label>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-          <button class="save-btn" id="storyImportBtn">Importeer bestand</button>
           <button class="save-btn" id="storyExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm permanent bijwerken voor iedereen? Bewerk <code>fpe_successen.txt</code> en upload 'm terug naar de repository. Importeren hieronder overschrijft de lijst alleen tijdelijk, voor jouw eigen scherm.
+          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm bijwerken? Download 'm hierboven, bewerk 'm lokaal, en upload het resultaat als <code>fpe_successen.txt</code> terug naar de repository.
         </p>
         <div class="status-msg" id="storyStatus"></div>
       </div>
@@ -1085,16 +1079,14 @@
         </div>
       </div>
 
-      <button class="add-toggle" id="promptAddToggle">⚙ Beheer vragenlijst (.txt)</button>
+      <button class="add-toggle" id="promptAddToggle">⬇ Download vragenlijst</button>
       <div class="add-form" id="promptAddForm">
-        <label>Bestand met vragen (.txt, per regel: <em>kernwaarde | vraag</em>)</label>
-        <input type="file" id="promptFileInput" accept=".txt" style="color:var(--muted); font-family:var(--font-mono); font-size:13px;">
+        <label>Vragenlijst</label>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-          <button class="save-btn" id="promptImportBtn">Importeer bestand</button>
           <button class="save-btn" id="promptExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm permanent bijwerken voor iedereen? Bewerk <code>fpe_overlegvragen.txt</code> en upload 'm terug naar de repository. Importeren hieronder overschrijft de lijst alleen tijdelijk, voor jouw eigen scherm.
+          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm bijwerken? Download 'm hierboven, bewerk 'm lokaal, en upload het resultaat als <code>fpe_overlegvragen.txt</code> terug naar de repository.
         </p>
         <div class="status-msg" id="promptStatus"></div>
       </div>
@@ -1336,23 +1328,6 @@ document.getElementById('dictAddToggle').addEventListener('click', () => {
   document.getElementById('dictAddForm').classList.toggle('show');
 });
 
-document.getElementById('dictImportBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('dictFileInput');
-  const status = document.getElementById('dictStatus');
-  const file = fileInput.files[0];
-  if(!file){ status.textContent = 'Kies eerst een .txt-bestand.'; return; }
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const parsed = parseTxt(e.target.result);
-    if(parsed.length === 0){ status.textContent = 'Geen geldige regels gevonden (verwacht: term | uitleg).'; return; }
-    dictList = parsed;
-    status.textContent = `✓ ${parsed.length} termen geïmporteerd — actief voor deze sessie.`;
-    renderDict(document.getElementById('dictSearch').value);
-  };
-  reader.onerror = () => { status.textContent = 'Kon het bestand niet lezen.'; };
-  reader.readAsText(file);
-});
-
 document.getElementById('dictExportBtn').addEventListener('click', () => {
   const blob = new Blob([toTxt(dictList)], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -1430,22 +1405,6 @@ document.getElementById('surpriseBtn').addEventListener('click', () => {
 
 document.getElementById('storyAddToggle').addEventListener('click', () => {
   document.getElementById('storyAddForm').classList.toggle('show');
-});
-
-document.getElementById('storyImportBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('storyFileInput');
-  const status = document.getElementById('storyStatus');
-  const file = fileInput.files[0];
-  if(!file){ status.textContent = 'Kies eerst een .txt-bestand.'; return; }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const parsed = parseStoriesTxt(e.target.result);
-    if(parsed.length === 0){ status.textContent = 'Geen geldige regels gevonden (verwacht: succes/flater | bron | tekst).'; return; }
-    storyList = parsed;
-    status.textContent = `✓ ${parsed.length} verhalen geïmporteerd — actief voor deze sessie.`;
-  };
-  reader.onerror = () => { status.textContent = 'Kon het bestand niet lezen.'; };
-  reader.readAsText(file);
 });
 
 document.getElementById('storyExportBtn').addEventListener('click', () => {
@@ -1609,23 +1568,6 @@ document.getElementById('spinBtn').addEventListener('click', () => {
 
 document.getElementById('promptAddToggle').addEventListener('click', () => {
   document.getElementById('promptAddForm').classList.toggle('show');
-});
-
-document.getElementById('promptImportBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('promptFileInput');
-  const status = document.getElementById('promptStatus');
-  const file = fileInput.files[0];
-  if(!file){ status.textContent = 'Kies eerst een .txt-bestand.'; return; }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const parsed = parsePromptsTxt(e.target.result);
-    if(parsed.length === 0){ status.textContent = 'Geen geldige regels gevonden (verwacht: kernwaarde | vraag).'; return; }
-    promptList = parsed;
-    drawWheel(promptList);
-    status.textContent = `✓ ${parsed.length} vragen geïmporteerd — actief voor deze sessie.`;
-  };
-  reader.onerror = () => { status.textContent = 'Kon het bestand niet lezen.'; };
-  reader.readAsText(file);
 });
 
 document.getElementById('promptExportBtn').addEventListener('click', () => {
@@ -2001,87 +1943,6 @@ document.getElementById('linkedinExportTxtBtn').addEventListener('click', () => 
   URL.revokeObjectURL(url);
 });
 
-document.getElementById('linkedinUploadBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('linkedinFileInput');
-  const status = document.getElementById('linkedinStatus');
-  const file = fileInput.files[0];
-  if(!file){ status.style.color = 'var(--coral)'; status.textContent = 'Kies eerst een Excel-bestand.'; return; }
-  if(typeof XLSX === 'undefined'){
-    status.style.color = 'var(--coral)';
-    status.textContent = 'Kon de Excel-bibliotheek niet laden. Controleer je internetverbinding en probeer opnieuw.';
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    try{
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type:'array' });
-
-      if(isLinkedInExportWorkbook(workbook)){
-        // Rechtstreekse LinkedIn-download (tabblad "Statistieken") — automatisch per kwartaal optellen
-        const { added, updated, keptExisting } = applyLinkedInExport(workbook);
-        if(added === 0 && updated === 0){
-          throw new Error('Geen bruikbare dagcijfers gevonden in het tabblad "Statistieken".');
-        }
-        await saveLinkedinSeries();
-        renderLinkedinDashboard();
-        status.style.color = 'var(--violet)';
-        status.textContent = `✓ LinkedIn-export verwerkt: ${added} nieuw kwartaal, ${updated} bijgewerkt` +
-          (keptExisting ? `, ${keptExisting} kwarta(a)l(en) ongemoeid gelaten (dit bestand dekt ze maar deels, bestaande complete cijfers blijven staan).` : '.');
-        fileInput.value = '';
-        return;
-      }
-
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { defval:'' });
-      if(!rows.length) throw new Error('Het bestand lijkt leeg.');
-
-      let added = 0, updated = 0, skipped = 0;
-      rows.forEach(rawRow => {
-        const rowNorm = {};
-        Object.keys(rawRow).forEach(k => { rowNorm[normalizeHeader(k)] = rawRow[k]; });
-
-        const period = findField(rowNorm, ['periode','period']);
-        const views = parseNumber(findField(rowNorm, ['weergaven','views']));
-        const reactions = parseNumber(findField(rowNorm, ['reacties','reactions']));
-        const comments = parseNumber(findField(rowNorm, ['comments']));
-        const followers = parseNumber(findField(rowNorm, ['nieuwe volgers','volgers','followers']));
-        // klikken en reposts zijn optioneel — ontbreken ze, dan tellen ze als 0 mee
-        let clicks = parseNumber(findField(rowNorm, ['klikken','clicks']));
-        let reposts = parseNumber(findField(rowNorm, ['reposts','shares','gedeeld']));
-        if(isNaN(clicks)) clicks = 0;
-        if(isNaN(reposts)) reposts = 0;
-
-        if(!period || String(period).trim()==='' || isNaN(views) || isNaN(reactions) || isNaN(comments) || isNaN(followers)){
-          skipped++; return;
-        }
-        const periodStr = String(period).trim();
-        const existingIdx = linkedinSeries.findIndex(r => r.period.trim().toLowerCase() === periodStr.toLowerCase());
-        const newRow = { period: periodStr, views, reactions, comments, clicks, reposts, followers };
-        if(existingIdx >= 0){ linkedinSeries[existingIdx] = newRow; updated++; }
-        else { linkedinSeries.push(newRow); added++; }
-      });
-
-      if(added === 0 && updated === 0){
-        throw new Error('Geen geldige rijen gevonden. Verwachte kolommen: periode, weergaven, reacties, comments, nieuwe volgers (klikken en reposts zijn optioneel).');
-      }
-
-      await saveLinkedinSeries();
-      renderLinkedinDashboard();
-      status.style.color = 'var(--violet)';
-      status.textContent = `✓ Verwerkt: ${added} nieuwe periode(s), ${updated} bijgewerkt` + (skipped ? `, ${skipped} rij(en) overgeslagen (ontbrekende of onjuiste velden).` : '.');
-      fileInput.value = '';
-    }catch(err){
-      status.style.color = 'var(--coral)';
-      status.textContent = 'Kon het bestand niet verwerken — ' + (err.message || 'controleer of het een geldig Excel-bestand is met de juiste kolommen.');
-    }
-  };
-  reader.onerror = () => {
-    status.style.color = 'var(--coral)';
-    status.textContent = 'Kon het bestand niet lezen.';
-  };
-  reader.readAsArrayBuffer(file);
-});
 
 /* ============================================================
    INIT
