@@ -887,6 +887,29 @@
   }
   .spin-btn:hover{ background:var(--violet-dim); }
   .spin-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+  .spin-btn-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .reset-btn{
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-family:var(--font-body);
+    font-weight:500;
+    font-size:14px;
+    padding:13px 18px;
+    border-radius:100px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{ border-color:var(--violet); color:var(--text); }
+  .reel-progress{
+    font-family:var(--font-body);
+    font-size:12px;
+    color:var(--muted);
+    margin-top:2px;
+  }
   .prompt-result{
     background:var(--surface-2);
     border-radius:16px;
@@ -1243,9 +1266,13 @@
             <div class="reel-strip" id="reelStrip"></div>
             <div class="reel-placeholder" id="reelPlaceholder">· · ·</div>
           </div>
+          <div class="reel-progress" id="reelProgress"></div>
         </div>
 
-        <button class="spin-btn" id="spinBtn">Spin het rad</button>
+        <div class="spin-btn-row">
+          <button class="spin-btn" id="spinBtn">Spin het rad</button>
+          <button class="reset-btn" id="resetRoundBtn" title="Begin opnieuw bij Linda">↺ Reset</button>
+        </div>
         <div class="prompt-result" id="promptResult">
           <span class="kw" id="promptKw"></span>
           <span id="promptText">Druk eerst op de knop.</span>
@@ -1729,12 +1756,23 @@ const COLORS = ['#123C36','#D8BBFF','#F2A45D','#E85D4A','#E9E5DC'];
 const NAMES = ['Linda', 'Marion', 'Nanja', 'Ferencz'];
 const REEL_ITEM_HEIGHT = 52;
 const REEL_CYCLES = 6;
+let currentPersonIndex = 0; // wie er nu aan de beurt is — telt op bij elke spin, reset via de resetknop
+
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+let roundOrder = shuffleArray(NAMES); // volgorde voor deze ronde — bij elke reset opnieuw gehusseld
 
 function buildReelStrip(){
   const strip = document.getElementById('reelStrip');
   strip.innerHTML = '';
   for(let c=0; c<REEL_CYCLES; c++){
-    NAMES.forEach(name => {
+    roundOrder.forEach(name => {
       const item = document.createElement('div');
       item.className = 'reel-item';
       item.textContent = name;
@@ -1745,10 +1783,20 @@ function buildReelStrip(){
   strip.style.transform = 'translateY(0px)';
 }
 
+function updateReelProgress(){
+  const el = document.getElementById('reelProgress');
+  if(currentPersonIndex >= roundOrder.length){
+    el.textContent = 'Iedereen is geweest — druk op reset om opnieuw te beginnen';
+  } else {
+    el.textContent = `Beurt ${currentPersonIndex + 1} van ${roundOrder.length}`;
+  }
+}
+
+/* Spint de koker naar de eerstvolgende persoon in de (willekeurig gehusselde) volgorde van deze ronde */
 function spinReel(){
   const strip = document.getElementById('reelStrip');
-  const chosenIndex = Math.floor(Math.random() * NAMES.length);
-  const targetItemIndex = (REEL_CYCLES - 1) * NAMES.length + chosenIndex;
+  const personIdx = Math.min(currentPersonIndex, roundOrder.length - 1);
+  const targetItemIndex = (REEL_CYCLES - 1) * roundOrder.length + personIdx;
   strip.style.transition = 'none';
   strip.style.transform = 'translateY(0px)';
   void strip.offsetHeight; // forceer reflow zodat de reset echt gebeurt
@@ -1756,7 +1804,19 @@ function spinReel(){
     strip.style.transition = 'transform 3.5s cubic-bezier(.17,.67,.21,1)';
     strip.style.transform = `translateY(-${targetItemIndex * REEL_ITEM_HEIGHT}px)`;
   });
-  return NAMES[chosenIndex];
+  if(currentPersonIndex < roundOrder.length) currentPersonIndex++;
+  updateReelProgress();
+  return roundOrder[personIdx];
+}
+
+function resetRound(){
+  currentPersonIndex = 0;
+  roundOrder = shuffleArray(NAMES); // nieuwe, willekeurige volgorde voor de nieuwe ronde
+  buildReelStrip();
+  document.getElementById('reelPlaceholder').classList.remove('hide');
+  document.getElementById('reelProgress').textContent = '';
+  document.getElementById('promptKw').textContent = '';
+  document.getElementById('promptText').textContent = 'Druk eerst op de knop.';
 }
 
 /* --- geluidjes (synthetisch, geen bestanden nodig) --- */
@@ -1845,6 +1905,11 @@ document.getElementById('spinBtn').addEventListener('click', () => {
     playLandSound();
     spinning = false;
   }, 3600);
+});
+
+document.getElementById('resetRoundBtn').addEventListener('click', () => {
+  if(spinning) return;
+  resetRound();
 });
 
 document.getElementById('promptAddToggle').addEventListener('click', () => {
