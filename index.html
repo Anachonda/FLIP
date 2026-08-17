@@ -1341,7 +1341,7 @@
       <div class="module-header-flex">
         <div class="module-header-text">
           <h2 class="module-title">✨ De Successenbank</h2>
-          <p class="module-sub">Schitterende Successen en fonkelende flaters uit onze eigen jaarmagazines — willekeurig opgediept. Perfect voor de vrijdagmiddag-chat.</p>
+          <p class="module-sub">Schitterende Successen uit onze eigen jaarmagazines, willekeurig opgediept. Perfect voor napraten tijdens Heel FPE Bakt.</p>
         </div>
         <img class="module-illustration" src="flip_succes.jpg" alt="FLIP verliest bijna de beker">
       </div>
@@ -1840,20 +1840,33 @@ document.getElementById('quizNextBtn').addEventListener('click', () => {
    MODULE 2: SUCCESSENBANK
    ============================================================ */
 const BASE_STORIES = [
-  { tag:'flater', meta:'Schitterende Successen 2024', text:'Bij een VR-project vertrok de technisch expert net voor de deadline. Twee collega\'s zochten het zelf uit via tutorials — en konden het daarna zelf ook. Les: zorg altijd voor een plan B.' },
-  { tag:'flater', meta:'Schitterende Successen 2024', text:'Op een congres in Hasselt bleek de presentatietijd vlak van tevoren gehalveerd. Een onderzoeker moest in paniek schrappen wat ze kon. Les: check altijd vooraf hoeveel tijd je precies hebt.' },
-  { tag:'flater', meta:'Schitterende Successen 2024', text:'Tijdens een workshop op een mbo-school deden de slides het niet, en zat de zaal totaal niet te wachten op het onderwerp. Door het gewoon te benoemen brak het ijs alsnog en ontstonden er mooie gesprekken.' },
-  { tag:'succes', meta:'Schitterende Successen 2024', text:'Voor de doorwerkers van FPE is het mooiste compliment niet een letterlijk compliment, maar het moment waarop ze merken dat hun werk echt iets losmaakt bij mensen.' },
   { tag:'succes', meta:'Schitterende Successen 2025', text:'Het jaarmagazine 2025 vat het jaar samen in vier woorden: koers kiezen, samenwerken, bloei en oogst.' },
   { tag:'succes', meta:'Schitterende Successen 2025', text:'Achter elk cijfer in het jaarmagazine zit een gesprek, een samenwerking, een publicatie of een idee dat werkelijkheid werd.' },
-  { tag:'succes', meta:'BKO Magazine', text:'De rubriek "Kennismaken met" liep 18 afleveringen lang en gaf FPE letterlijk een gezicht — door onderzoekers elkaar te laten interviewen.' },
+  { tag:'succes', meta:'BKO Magazine', text:'De rubriek "Kennismaken met" liep 18 afleveringen lang en gaf FPE letterlijk een gezicht, door onderzoekers elkaar te laten interviewen.' },
   { tag:'succes', meta:'MJP 2024-2030', text:'De kerntaak van het LIC, waar FPE onder valt, is samen te vatten in drie woorden: leren, innoveren, co-creëren.' },
   { tag:'succes', meta:'Schitterende Successen 2023', text:'In 2023 zei niemand nee: elke subsidieaanvraag die FPE indiende, werd gehonoreerd.' },
   { tag:'succes', meta:'Schitterende Successen 2024', text:'Een gift van de ASML Foundation viel hoger uit dan verwacht en gaf Digitale Didactiek een enorme boost richting inclusief onderwijs.' },
-  { tag:'succes', meta:'Schitterende Successen 2024', text:'Na een halfjaar voorbereiding stond Peter Verkoeijen op het podium voor zijn oratie aan de Erasmus Universiteit — en de overweldigende reacties maakten alles meer dan waard.' },
+  { tag:'succes', meta:'Schitterende Successen 2024', text:'Na een halfjaar voorbereiding stond Peter Verkoeijen op het podium voor zijn oratie aan de Erasmus Universiteit, en de overweldigende reacties maakten alles meer dan waard.' },
   { tag:'succes', meta:'Schitterende Successen 2025', text:'Eén LinkedIn-post van Esther van der Stappen groeide binnen vier maanden uit tot een volledig uitgevoerd én afgerond Npuls-project.' },
   { tag:'succes', meta:'Schitterende Successen 2023', text:'Jongeren signaleerden zelf een probleem uit hun eigen leven, en dat idee groeide uit tot de Studentenwelzijnswijzer.' },
   { tag:'succes', meta:'Zelfevaluatie Expertisecentrum FPE 2022-2025', text:'De TRAIL-tool begon als klein onderdeel van een Europees project en groeide uit tot een tool die onderwijsontwikkelaars door heel Nederland gebruiken.' },
+  { tag:'succes', meta:'Schitterende Successen 2024', text:'Waar FPE in 2022 begon als paraplu voor drie losse lectoraten, is het nu een hecht team dat samenwerkt aan het verbeteren van de onderwijspraktijk, zonder de eigen identiteit van de afzonderlijke lectoraten te verliezen.' },
+  { tag:'succes', meta:'Schitterende Successen 2024', text:'Onze doorwerkers zijn de schakel tussen onderzoek en praktijk. Zij zorgen ervoor dat de kennis die we ontwikkelen terechtkomt waar die nodig is: in de onderwijspraktijk.' },
+  { tag:'succes', meta:'Schitterende Successen 2024', text:'FPE vergroot haar zichtbaarheid en invloed dankzij een actief ambassadeursnetwerk van vrienden en partners dat onze successen deelt, het eigen netwerk inzet en zo nieuwe verbindingen en strategische samenwerkingen mogelijk maakt.' },
+  { tag:'succes', meta:'Schitterende Successen 2023', text:'De Motivatiemotor begon in het hoger onderwijs en vond daarna ook zijn weg naar het voortgezet onderwijs, waar het instrument met succes werd ingezet.' },
+  { tag:'succes', meta:'Schitterende Successen 2023', text:'Brein en Leren kreeg middelen voor SELFLEX binnen de NRO-call voor grote vragen in het hoger onderwijs en kon daarmee grootschalig onderzoek doen naar de ondersteuning van zelfregulerend leren.' },
+  { tag:'succes', meta:'Schitterende Successen 2023', text:'De doorwerkers van Brein en Leren bouwden een SharePoint rond formatief handelen, waarmee onderzoekskennis een vaste plek kreeg voor docenten binnen Avans.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'Brein en Leren vierde zijn tienjarig bestaan samen met verschillende academies: een teken dat het lectoraat stevig is verankerd in het onderwijs van Avans.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'Zelfregulerend leren groeide via een docentprofessionaliseringstraject uit tot een sterk thema binnen Verpleegkunde en kreeg inmiddels ook landelijke aandacht.' },
+  { tag:'succes', meta:'Schitterende Successen 2023', text:'Digitale Didactiek ontwikkelde het bordspel Best of Both Worlds, waarmee onderwijsprofessionals het gesprek voeren over de balans tussen mens en technologie in het onderwijs. Het spel kreeg aandacht op verschillende congressen en binnen onze academies.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'2025 was voor Digitale Didactiek een echt oogstjaar: meerdere tijdschriftartikelen werden ingediend en de focus verschoof steeds sterker naar het delen en toepassen van opgebouwde kennis.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'Een sessie van Digitale Didactiek op het SIA-congres leverde nieuwe contacten en samenwerkingen op, doordat bezoekers in het onderzoek precies de expertise herkenden die zij zochten.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'Meer dan 200 docenten namen deel aan workshops over Formatief Quizzen; onderzoek, professionalisering en doorwerking kwamen daarmee in één activiteit samen.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'Bij het onderzoek naar Formatief Quizzen kwam in 2025 een praktische AI-toepassing: een hulpmiddel waarmee docenten met AI quizvragen kunnen genereren en direct in Brightspace kunnen importeren.' },
+  { tag:'succes', meta:'Schitterende Successen 2023', text:'Het lectoraat Transdisciplinair Samenwerken in Onderwijs bracht studenten uit mbo, hbo en wo samen in één diverse onderzoeksgroep waarin studenten zelf actief deelnamen aan het onderzoek.' },
+  { tag:'succes', meta:'Schitterende Successen 2023', text:'Het Comeniusnetwerk omarmde het idee achter de TRAIL-tool, waarna het lectoraat workshops gaf en een samenwerking met de Universiteit Twente ontstond.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'Binnen Top Avans liepen onderzoek en onderwijs letterlijk naast elkaar: terwijl teams transdisciplinaire keuzemodules ontwikkelden, onderzocht het lectoraat het proces en deelde het inzichten direct terug met de praktijk.' },
+  { tag:'succes', meta:'Schitterende Successen 2025', text:'De TRAIL-tool kreeg tijdens de Dutch Design Week en een expositie in OpenX een podium buiten Avans en bracht studenten, beleidsmakers en nieuwe doelgroepen met elkaar in gesprek over transdisciplinair samenwerken.' },
 ];
 
 let storyList = [...BASE_STORIES];
