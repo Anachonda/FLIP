@@ -1644,14 +1644,18 @@ async function fetchGithubTxt(filename){
 
 /* Zelfde als fetchGithubTxt, maar geeft ook de "laatst gewijzigd"-datum van GitHub mee,
    zodat we per module kunnen tonen wanneer het bestand voor het laatst is bijgewerkt. */
-async function fetchGithubTxtWithDate(filename){
+/* Vraagt bij GitHub's API de datum van de laatste commit voor dit specifieke bestand op —
+   betrouwbaarder dan de Last-Modified header van raw.githubusercontent.com, die GitHub
+   in de praktijk vaak niet (correct) meestuurt. */
+async function fetchGithubLastCommitDate(filename){
   try{
-    const res = await fetch(GITHUB_RAW_BASE + filename + '?t=' + Date.now(), { cache:'no-store' });
-    if(!res.ok) return { text:null, updated:null };
-    const text = await res.text();
-    const lastModified = res.headers.get('Last-Modified'); // bv. "Mon, 17 Aug 2026 09:12:00 GMT"
-    return { text, updated: lastModified };
-  }catch(e){ return { text:null, updated:null }; }
+    const url = `https://api.github.com/repos/Anachonda/FLIP/commits?path=${encodeURIComponent(filename)}&per_page=1`;
+    const res = await fetch(url, { cache:'no-store' });
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length === 0) return null;
+    return data[0]?.commit?.committer?.date || data[0]?.commit?.author?.date || null;
+  }catch(e){ return null; }
 }
 function formatDutchDate(headerDateStr){
   if(!headerDateStr) return null;
@@ -2549,19 +2553,20 @@ renderFormatterOutput();
    ============================================================ */
 (async function init(){
   // haal de actuele lijsten op vanaf GitHub; val terug op de ingebouwde data als dat niet lukt
-  const [dictResult, storyResult, promptResult, linkedinTxt] = await Promise.all([
-    fetchGithubTxtWithDate('fpe_woordenboek.txt'),
-    fetchGithubTxtWithDate('fpe_successen.txt'),
-    fetchGithubTxtWithDate('fpe_overlegvragen.txt'),
+  const [dictTxt, storyTxt, promptTxt, linkedinTxt] = await Promise.all([
+    fetchGithubTxt('fpe_woordenboek.txt'),
+    fetchGithubTxt('fpe_successen.txt'),
+    fetchGithubTxt('fpe_overlegvragen.txt'),
     fetchGithubTxt('fpe_linkedin_cijfers.txt'),
   ]);
-  const dictTxt = dictResult.text, storyTxt = storyResult.text, promptTxt = promptResult.text;
   if(dictTxt){ const parsed = parseTxt(dictTxt); if(parsed.length) dictList = parsed; }
   if(storyTxt){ const parsed = parseStoriesTxt(storyTxt); if(parsed.length) storyList = parsed; }
   if(promptTxt){ const parsed = parsePromptsTxt(promptTxt); if(parsed.length){ promptList = parsed; } }
-  showUpdateBadge('dictUpdateBadge', dictResult.updated);
-  showUpdateBadge('storyUpdateBadge', storyResult.updated);
-  showUpdateBadge('promptUpdateBadge', promptResult.updated);
+
+  // "laatst bijgewerkt"-datums apart en betrouwbaar ophalen via GitHub's commit-geschiedenis
+  fetchGithubLastCommitDate('fpe_woordenboek.txt').then(d => showUpdateBadge('dictUpdateBadge', d));
+  fetchGithubLastCommitDate('fpe_successen.txt').then(d => showUpdateBadge('storyUpdateBadge', d));
+  fetchGithubLastCommitDate('fpe_overlegvragen.txt').then(d => showUpdateBadge('promptUpdateBadge', d));
 
   renderDict();
   drawWheel(promptList);
