@@ -1297,6 +1297,8 @@
         <img class="module-illustration" src="flip_woordenboek.jpg" alt="FLIP leest het woordenboek">
       </div>
 
+      <span class="update-badge" id="dictUpdateBadge" style="display:none; margin-bottom:16px;"></span>
+
       <div class="search-row">
         <div class="autocomplete-wrap">
           <input type="text" id="dictSearch" placeholder="Typ een afkorting, bv. ‘BKO’…" autocomplete="off">
@@ -1346,6 +1348,8 @@
         <img class="module-illustration" src="flip_succes.jpg" alt="FLIP verliest bijna de beker">
       </div>
 
+      <span class="update-badge" id="storyUpdateBadge" style="display:none; margin-bottom:16px;"></span>
+
       <button class="stamp-btn" id="surpriseBtn">Verras me</button>
 
       <div class="story-card" id="storyCard">
@@ -1377,6 +1381,8 @@
         </div>
         <img class="module-illustration" src="flip_roulette.jpg" alt="FLIP spint het rad">
       </div>
+
+      <span class="update-badge" id="promptUpdateBadge" style="display:none; margin-bottom:16px;"></span>
 
       <div class="wheel-area">
         <svg id="wheel" width="260" height="260" viewBox="0 0 260 260"></svg>
@@ -1634,6 +1640,31 @@ async function fetchGithubTxt(filename){
     if(!res.ok) return null;
     return await res.text();
   }catch(e){ return null; } // offline / lokaal geopend / netwerkfout: gewoon terugvallen op de ingebouwde lijst
+}
+
+/* Zelfde als fetchGithubTxt, maar geeft ook de "laatst gewijzigd"-datum van GitHub mee,
+   zodat we per module kunnen tonen wanneer het bestand voor het laatst is bijgewerkt. */
+async function fetchGithubTxtWithDate(filename){
+  try{
+    const res = await fetch(GITHUB_RAW_BASE + filename + '?t=' + Date.now(), { cache:'no-store' });
+    if(!res.ok) return { text:null, updated:null };
+    const text = await res.text();
+    const lastModified = res.headers.get('Last-Modified'); // bv. "Mon, 17 Aug 2026 09:12:00 GMT"
+    return { text, updated: lastModified };
+  }catch(e){ return { text:null, updated:null }; }
+}
+function formatDutchDate(headerDateStr){
+  if(!headerDateStr) return null;
+  const d = new Date(headerDateStr);
+  if(isNaN(d.getTime())) return null;
+  return d.toLocaleDateString('nl-NL', { day:'numeric', month:'long', year:'numeric' });
+}
+function showUpdateBadge(elId, headerDateStr){
+  const el = document.getElementById(elId);
+  const formatted = formatDutchDate(headerDateStr);
+  if(!formatted) return; // geen datum bekend (bv. lokaal geopend) — badge blijft gewoon verborgen
+  el.textContent = `Laatst bijgewerkt: ${formatted}`;
+  el.style.display = 'inline-block';
 }
 
 /* ============================================================
@@ -2518,15 +2549,19 @@ renderFormatterOutput();
    ============================================================ */
 (async function init(){
   // haal de actuele lijsten op vanaf GitHub; val terug op de ingebouwde data als dat niet lukt
-  const [dictTxt, storyTxt, promptTxt, linkedinTxt] = await Promise.all([
-    fetchGithubTxt('fpe_woordenboek.txt'),
-    fetchGithubTxt('fpe_successen.txt'),
-    fetchGithubTxt('fpe_overlegvragen.txt'),
+  const [dictResult, storyResult, promptResult, linkedinTxt] = await Promise.all([
+    fetchGithubTxtWithDate('fpe_woordenboek.txt'),
+    fetchGithubTxtWithDate('fpe_successen.txt'),
+    fetchGithubTxtWithDate('fpe_overlegvragen.txt'),
     fetchGithubTxt('fpe_linkedin_cijfers.txt'),
   ]);
+  const dictTxt = dictResult.text, storyTxt = storyResult.text, promptTxt = promptResult.text;
   if(dictTxt){ const parsed = parseTxt(dictTxt); if(parsed.length) dictList = parsed; }
   if(storyTxt){ const parsed = parseStoriesTxt(storyTxt); if(parsed.length) storyList = parsed; }
   if(promptTxt){ const parsed = parsePromptsTxt(promptTxt); if(parsed.length){ promptList = parsed; } }
+  showUpdateBadge('dictUpdateBadge', dictResult.updated);
+  showUpdateBadge('storyUpdateBadge', storyResult.updated);
+  showUpdateBadge('promptUpdateBadge', promptResult.updated);
 
   renderDict();
   drawWheel(promptList);
