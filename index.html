@@ -605,6 +605,88 @@
     color:var(--muted);
     margin:0;
   }
+
+  /* ---------- meedenkers ---------- */
+  .resource-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px;
+    margin:24px 0;
+  }
+  .resource-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .resource-card-title{
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:20px;
+    color:var(--text);
+  }
+  .resource-card-text{
+    font-size:14.5px;
+    line-height:1.55;
+    color:var(--muted);
+    flex:1;
+  }
+  .resource-card-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    align-self:flex-start;
+    background:var(--violet);
+    color:#fff;
+    text-decoration:none;
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13.5px;
+    padding:10px 18px;
+    border-radius:100px;
+    margin-top:4px;
+  }
+  .resource-card-link:hover{ background:var(--violet-dim); }
+  .rules-card{
+    background:rgba(242,164,93,0.14);
+    border:1px solid rgba(242,164,93,0.4);
+    border-radius:18px;
+    padding:22px 24px;
+    margin-top:8px;
+  }
+  .rules-label{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--text);
+    margin-bottom:10px;
+  }
+  .rules-text{
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--text);
+    margin:0 0 12px;
+  }
+  .rules-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13.5px;
+    color:var(--violet);
+    text-decoration:none;
+  }
+  .rules-link:hover{ text-decoration:underline; }
+
   .chart-title{
     font-family:var(--font-display);
     font-weight:800;
@@ -1103,6 +1185,14 @@
         </span>
         <span class="tile-arrow">→</span>
       </button>
+      <button class="tile-card" data-target="meedenkers">
+        <span class="tile-emoji">🤝</span>
+        <span class="tile-text">
+          <span class="tile-title">Meedenkers</span>
+          <span class="tile-sub">Handige AI-hulp voor tekst en advies</span>
+        </span>
+        <span class="tile-arrow">→</span>
+      </button>
       <button class="tile-card" data-target="roulette">
         <span class="tile-emoji">🎯</span>
         <span class="tile-text">
@@ -1435,6 +1525,40 @@ De app herkent automatisch verschillende opmaakformaten!"></textarea>
     </div>
   </section>
 
+  <!-- ============ MODULE MEEDENKERS ============ -->
+  <section class="module" id="module-meedenkers">
+    <div class="card">
+      <div class="module-header-flex">
+        <div class="module-header-text">
+          <h2 class="module-title">🤝 Meedenkers</h2>
+          <p class="module-sub">Custom GPT's die met je meedenken. Vraag ze om hulp zoals je een collega iets zou vragen. Houd wel rekening met de regels rondom AI-gebruik bij Avans.</p>
+        </div>
+        <img class="module-illustration" src="flip_meedenkers.jpg" alt="FLIP overlegt met twee robot-collega's aan tafel">
+      </div>
+
+      <div class="resource-grid">
+        <div class="resource-card">
+          <div class="resource-card-title">Brenda</div>
+          <p class="resource-card-text">Assistent, communicatiespecialist en redacteur voor Future-Proof Education. Kent de lectoraten en communicatiestrategieën van FPE goed, waaronder de LinkedIn-strategie. Ondersteunt bij het schrijven van teksten en geeft strategisch advies voor onderwijsinnovatie en onderzoek, voor impactvolle content binnen en buiten Avans.</p>
+          <a class="resource-card-link" href="https://chatgpt.com/g/g-JcRUzIDQd-futurist-fpe" target="_blank" rel="noopener">Open Brenda →</a>
+        </div>
+        <div class="resource-card">
+          <div class="resource-card-title">Schrijfwijzer Assistent</div>
+          <p class="resource-card-text">Gemaakt voor iedereen bij Avans en controleert Nederlandse teksten op de Avans-manier van schrijven. Geeft de beste feedback als je erbij vertelt wie de doelgroep is en wat het doel van je tekst is.</p>
+          <a class="resource-card-link" href="https://chatgpt.com/g/g-Z7RjX1Ydp-schrijfwijzer-assistent" target="_blank" rel="noopener">Open Schrijfwijzer Assistent →</a>
+        </div>
+      </div>
+
+      <p class="module-sub" style="font-size:13.5px; margin-top:-8px;">Let op: beide zijn custom GPT's op chatgpt.com. Je hebt daar zelf een ChatGPT-account voor nodig.</p>
+
+      <div class="rules-card">
+        <div class="rules-label">📋 Spelregels AI bij Avans</div>
+        <p class="rules-text">Zie AI als hulpmiddel, niet als vervanger. Jij blijft verantwoordelijk voor het resultaat. Deel nooit vertrouwelijke of herleidbare persoonsgegevens; twijfel je over wat wel of niet mag, ga dan uit van de veiligste optie.</p>
+        <a class="rules-link" href="https://avans.sharepoint.com/sites/organisatie-en-beleid/SitePages/Hoe-werken-we-met-AI.aspx" target="_blank" rel="noopener">Volledige richtlijnen: Hoe werken we met AI →</a>
+      </div>
+    </div>
+  </section>
+
   <footer class="site-footer">
     <div class="footer-inner">
       Gemaakt voor Linda, Marion, Nanja en Ferencz — team Ondersteuning FPE. Heb je een idee, een nieuwe term of een verhaal voor FLIP? Vraag het even aan Ferencz.
@@ -1455,6 +1579,7 @@ const MODULES = [
   { id: 'start', label: 'Start' },
   { id: 'linkedin',    label: 'LinkedIn-statistieken' },
   { id: 'formatter',   label: 'LinkedIn Tekstopmaker' },
+  { id: 'meedenkers',  label: 'Meedenkers' },
   { id: 'roulette',    label: 'Overlegroulette' },
   { id: 'successen',   label: 'Successenbank' },
   { id: 'woordenboek', label: 'Woordenboek' }
