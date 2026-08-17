@@ -1160,7 +1160,6 @@
       <span class="eyebrow-pill">Team Ondersteuning · FPE</span>
       <h1 class="hero-title">FLIP</h1>
       <p class="hero-tagline">FPE Leer en Informatie Programma</p>
-      <p class="hero-intro">Het speelse kennishoekje van team Ondersteuning — gevoed door onze eigen documenten. Blader door het jargon, duik in onze successen, of laat het rad bepalen wie er los mag tijdens het overleg.</p>
 
       <div class="hero-media">
         <div class="hero-shape" aria-hidden="true"></div>
@@ -1244,6 +1243,8 @@
         </select>
       </div>
       <div class="status-msg" id="linkedinStatus"></div>
+      <p class="module-sub" style="font-size:12.5px; margin-top:4px;">Download deze lijst om hem te bekijken of aan te passen. Stuur de aangepaste lijst naar Ferencz zodat hij hem kan uploaden.</p>
+      <p class="module-sub" style="font-size:12.5px; margin-top:2px;">Downloaden werkt alleen als je FLIP in een browser opent, niet in de ingesloten weergave binnen Teams/SharePoint.</p>
 
       <div class="stat-grid" style="margin:20px 0 28px;">
         <div class="stat-card">
@@ -1283,11 +1284,6 @@
           <span><i class="dot" style="background:var(--coral)"></i>Comments</span>
         </div>
         <svg id="chartEngagement" class="bar-chart" viewBox="0 0 640 220"></svg>
-      </div>
-
-      <button class="add-toggle" id="linkedinTableToggle">⬇ Download & corrigeer periodes</button>
-      <div class="add-form" id="linkedinTableForm">
-        <div id="linkedinTableWrap"></div>
       </div>
     </div>
   </section>
@@ -1333,8 +1329,9 @@
           <button class="save-btn" id="dictExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm bijwerken? Download 'm hierboven, bewerk 'm lokaal, en upload het resultaat als <code>fpe_woordenboek.txt</code> terug naar de repository.
+          Download deze lijst om hem te bekijken of aan te passen. Stuur de aangepaste lijst naar Ferencz zodat hij hem kan uploaden.
         </p>
+        <p style="font-size:12.5px; color:var(--muted); margin:4px 0 0;">Downloaden werkt alleen als je FLIP in een browser opent, niet in de ingesloten weergave binnen Teams/SharePoint.</p>
         <div class="status-msg" id="dictStatus"></div>
       </div>
     </div>
@@ -1364,8 +1361,9 @@
           <button class="save-btn" id="storyExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm bijwerken? Download 'm hierboven, bewerk 'm lokaal, en upload het resultaat als <code>fpe_successen.txt</code> terug naar de repository.
+          Download deze lijst om hem te bekijken of aan te passen. Stuur de aangepaste lijst naar Ferencz zodat hij hem kan uploaden.
         </p>
+        <p style="font-size:12.5px; color:var(--muted); margin:4px 0 0;">Downloaden werkt alleen als je FLIP in een browser opent, niet in de ingesloten weergave binnen Teams/SharePoint.</p>
         <div class="status-msg" id="storyStatus"></div>
       </div>
     </div>
@@ -1411,8 +1409,9 @@
           <button class="save-btn" id="promptExportBtn" style="background:var(--amber); color:var(--text);">Download huidige lijst als .txt</button>
         </div>
         <p style="font-size:12.5px; color:var(--muted); margin:6px 0 0;">
-          Deze app laadt de lijst automatisch vanaf GitHub. Wil je 'm bijwerken? Download 'm hierboven, bewerk 'm lokaal, en upload het resultaat als <code>fpe_overlegvragen.txt</code> terug naar de repository.
+          Download deze lijst om hem te bekijken of aan te passen. Stuur de aangepaste lijst naar Ferencz zodat hij hem kan uploaden.
         </p>
+        <p style="font-size:12.5px; color:var(--muted); margin:4px 0 0;">Downloaden werkt alleen als je FLIP in een browser opent, niet in de ingesloten weergave binnen Teams/SharePoint.</p>
         <div class="status-msg" id="promptStatus"></div>
       </div>
     </div>
@@ -2344,48 +2343,6 @@ function drawGroupedChart(svgId, data, keyA, colorA, keyB, colorB){
   });
 }
 
-function renderLinkedinTable(){
-  const wrap = document.getElementById('linkedinTableWrap');
-  let html = '<table class="linkedin-table"><thead><tr><th>Periode</th><th>Weergaven</th><th>Reacties</th><th>Comments</th><th>Klikken</th><th>Reposts</th><th>Nieuwe volgers</th><th></th></tr></thead><tbody>';
-  linkedinSeries.forEach((row,i) => {
-    const lopend = !isPeriodComplete(row.period);
-    html += `<tr${lopend ? ' style="opacity:0.65;"' : ''}>
-      <td><input type="text" data-idx="${i}" data-field="period" value="${escapeHtml(row.period)}">${lopend ? '<div style="font-size:11px;color:var(--muted);margin-top:2px;">lopend — niet in cijfers/grafieken</div>' : ''}</td>
-      <td><input type="text" data-idx="${i}" data-field="views" value="${row.views}"></td>
-      <td><input type="text" data-idx="${i}" data-field="reactions" value="${row.reactions}"></td>
-      <td><input type="text" data-idx="${i}" data-field="comments" value="${row.comments}"></td>
-      <td><input type="text" data-idx="${i}" data-field="clicks" value="${row.clicks || 0}"></td>
-      <td><input type="text" data-idx="${i}" data-field="reposts" value="${row.reposts || 0}"></td>
-      <td><input type="text" data-idx="${i}" data-field="followers" value="${row.followers}"></td>
-      <td><button class="row-delete-btn" data-idx="${i}" title="Verwijder periode">×</button></td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
-
-  wrap.querySelectorAll('input').forEach(inp => {
-    inp.addEventListener('change', async (e) => {
-      const idx = parseInt(e.target.dataset.idx,10);
-      const field = e.target.dataset.field;
-      let val = e.target.value;
-      if(field !== 'period'){ val = parseNumber(val); if(isNaN(val)) val = 0; }
-      linkedinSeries[idx][field] = val;
-      await saveLinkedinSeries();
-      renderLinkedinDashboard();
-    });
-  });
-  wrap.querySelectorAll('.row-delete-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const idx = parseInt(e.target.dataset.idx,10);
-      const label = linkedinSeries[idx].period;
-      if(!confirm(`Periode "${label}" verwijderen uit de reeks?`)) return;
-      linkedinSeries.splice(idx,1);
-      await saveLinkedinSeries();
-      renderLinkedinDashboard();
-    });
-  });
-}
-
 function renderLinkedinDashboard(){
   const rangeData = getRangeData();
   const completed = getCompletedSeries();
@@ -2410,13 +2367,9 @@ function renderLinkedinDashboard(){
   drawBarChart('chartViews', rangeData, 'views', '#123C36');
   drawBarChart('chartFollowers', rangeData, 'followers', '#F2A45D');
   drawGroupedChart('chartEngagement', rangeData, 'reactions', '#123C36', 'comments', '#E85D4A');
-  renderLinkedinTable();
 }
 
 document.getElementById('rangeSelect').addEventListener('change', renderLinkedinDashboard);
-document.getElementById('linkedinTableToggle').addEventListener('click', () => {
-  document.getElementById('linkedinTableForm').classList.toggle('show');
-});
 
 document.getElementById('linkedinExportBtn').addEventListener('click', () => {
   if(typeof XLSX === 'undefined'){
