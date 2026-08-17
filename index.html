@@ -1234,7 +1234,6 @@
       </div>
 
       <div class="dash-controls">
-        <button class="save-btn" id="linkedinExportBtn" style="background:var(--amber); color:var(--text);">Download reeks als .xlsx</button>
         <button class="save-btn" id="linkedinExportTxtBtn">Download .txt voor GitHub</button>
         <select id="rangeSelect">
           <option value="all">Alle periodes</option>
@@ -1243,8 +1242,7 @@
         </select>
       </div>
       <div class="status-msg" id="linkedinStatus"></div>
-      <p class="module-sub" style="font-size:12.5px; margin-top:4px;">Download deze lijst om hem te bekijken of aan te passen. Stuur de aangepaste lijst naar Ferencz zodat hij hem kan uploaden.</p>
-      <p class="module-sub" style="font-size:12.5px; margin-top:2px;">Downloaden werkt alleen als je FLIP in een browser opent, niet in de ingesloten weergave binnen Teams/SharePoint.</p>
+      <p class="module-sub" style="font-size:12.5px; margin-top:4px;">Downloaden werkt alleen als je FLIP in een browser opent, niet in de ingesloten weergave binnen Teams/SharePoint.</p>
 
       <div class="stat-grid" style="margin:20px 0 28px;">
         <div class="stat-card">
@@ -2370,28 +2368,6 @@ function renderLinkedinDashboard(){
 }
 
 document.getElementById('rangeSelect').addEventListener('change', renderLinkedinDashboard);
-
-document.getElementById('linkedinExportBtn').addEventListener('click', () => {
-  if(typeof XLSX === 'undefined'){
-    const status = document.getElementById('linkedinStatus');
-    status.style.color = 'var(--coral)';
-    status.textContent = 'Kon de Excel-bibliotheek niet laden. Controleer je internetverbinding.';
-    return;
-  }
-  const rows = linkedinSeries.map(r => ({
-    periode: r.period,
-    weergaven: r.views,
-    reacties: r.reactions,
-    comments: r.comments,
-    klikken: r.clicks || 0,
-    reposts: r.reposts || 0,
-    'nieuwe volgers': r.followers
-  }));
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'LinkedIn');
-  XLSX.writeFile(wb, 'fpe_linkedin_cijfers.xlsx');
-});
 
 document.getElementById('linkedinExportTxtBtn').addEventListener('click', () => {
   const blob = new Blob([toLinkedinTxt(linkedinSeries)], { type: 'text/plain;charset=utf-8' });
